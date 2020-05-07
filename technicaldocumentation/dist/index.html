@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - TechnicalDocumentation</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<nav id="navbar">
+  <header>AngularJS Documentation</header>
+  <ul>
+    <li><a href="#Introduction" class="nav-link">Introduction</a></li>
+    <li><a href="#AngularJS_Template" class="nav-link">AngularJS Template</a></li>
+    <li><a href="#Components" class="nav-link">Components</a></li>
+    <li><a href="#Two_way_Data_Binding" class="nav-link">Two way Data Binding</a></li>
+    <li><a href="#Routing_and_Multiple_Views" class="nav-link">Routing and Multiple Views</a></li>
+    <li><a href="#Event_Handler" class="nav-link">Event Handler</a></li>
+    <li><a href="#REST_and_Custom_Services" class="nav-link">REST and Custom Services</a></li>
+    <li><a href="#Conclusion" class="nav-link">Conclusion</a></li>
+  </ul>
+</nav>
+<main id="main-doc">
+  <section class="main-section" id="Introduction">
+    <header>Introduction</header>
+    <article>
+      <p>
+        AngularJS is a JavaScript framework. It can be added to an HTML page with a script tag.
+        AngularJS extends HTML attributes with Directives, and binds data to HTML with Expressions.
+      </p>
+      <p>
+        AngularJS extends HTML with ng-directives.The ng-app directive defines an AngularJS application.The ng-model directive binds the value of HTML controls (input, select, textarea) to application data.The ng-bind directive binds application data to the HTML view.</p>
+    </article>
+  </section>
+  <section class="main-section" id="AngularJS_Template">
+    <header>AngularJS Template</header>
+    <p>
+      There are many ways to structure the code for an application. For AngularJS applications, we encourage the use of the Model-View-Controller (MVC) design pattern to decouple the code and separate concerns. With that in mind, let's use a little AngularJS and JavaScript to add models, views, and controllers to our app.
+    </p>
+    <h3>View and Template</h3>
+    <p>
+      In AngularJS, the view is a projection of the model through the HTML template. This means that whenever the model changes, AngularJS refreshes the appropriate binding points, which updates the view.The view is constructed by AngularJS from this template.
+    </p>
+    <span><strong>app/index.html:</strong></span>
+    <pre class="line-numbers">
+          <code class="language-markup">
+              <html ng-app="phonecatApp">
+                <head>
+ 
+              <script src="lib/angular/angular.js"></script>
+              <script src="app.js"></script>
+            </head>
+            <body ng-controller="PhoneListController">
+
+              <ul>
+                <li ng-repeat="phone in phones">
+                  <span>{{phone.name}}</span>
+                  <p>{{phone.snippet}}</p>
+                </li>
+              </ul>
+
+            </body>
+            </html>
+          </code>
+          </pre>
+    <h3>Model and Controller</h3>
+    <p>
+
+      The data model (a simple array of phones in object literal notation) is now instantiated within the PhoneListController controller. The controller is simply a constructor function that takes a $scope parameter:
+    </p>
+    <span><strong>app/app.js:</strong></span>
+    <pre class="line-number">
+        <code class="language-javascript">
+        // Define the `phonecatApp` module
+        var phonecatApp = angular.module('phonecatApp', []);
+
+        // Define the `PhoneListController` controller on the `phonecatApp` module
+        phonecatApp.controller('PhoneListController', function PhoneListController($scope) {
+          $scope.phones = [
+            {
+              name: 'Nexus S',
+              snippet: 'Fast just got faster with Nexus S.'
+            }, {
+              name: 'Motorola XOOM™ with Wi-Fi',
+              snippet: 'The Next, Next Generation tablet.'
+            }, {
+              name: 'MOTOROLA XOOM™',
+              snippet: 'The Next, Next Generation tablet.'
+            }
+          ];
+        });
+</code>
+
+</pre>
+
+  </section>
+  <section class="main-section" id="Components">
+    <header>Components</header>
+    <p>
+      In the previous step, we saw how a controller and a template worked together to convert a static HTML page into a dynamic view. This is a very common pattern in Single-Page Applications in general (and AngularJS applications in particular):
+    </p>
+    <ul>
+      <li>
+        Instead of creating a static HTML page on the server, the client-side code "takes over" and interacts dynamically with the view, updating it instantly to reflect changes in model data or state, usually as a result of user interaction (we'll see an example shortly in step 5).
+      </li>
+
+    </ul>
+    <p>The template (the part of the view containing the bindings and presentation logic) acts as a blueprint for how our data should be organized and presented to the user. The controller provides the context in which the bindings are evaluated and applies behavior and logic to our template.
+
+      There are still a couple of areas we can do better:
+      <ul>
+        <li>
+          What if we want to reuse the same functionality in a different part of our application ?
+          We would need to duplicate the whole template (including the controller). This is error-prone and hurts maintainability.
+        </li>
+        <li>
+          The scope, that glues our controller and template together into a dynamic view, is not isolated from other parts of the page. What this means is that a random, unrelated change in a different part of the page (e.g. a property-name conflict) could have unexpected and hard-to-debug side effects on our view.
+        </li>
+      </ul>
+    </p>
+    <p>
+      <pre class="line-number">
+      <code class="language-javascript">
+      angular.
+  module('myApp').
+  component('greetUser', {
+    template: 'Hello, {{$ctrl.user}}!',
+    controller: function GreetUserController() {
+      this.user = 'world';
+    }
+  });
+</code>
+</pre>
+    </p>
+  </section>
+  <section class="main-section" id="Two_way_Data_Binding">
+    <header>Two way Data Binding</header>
+    <p>
+      In this step, we will add a feature to let our users control the order of the items in the phone list. The dynamic ordering is implemented by creating a new model property, wiring it together with the repeater, and letting the data binding magic do the rest of the work.
+      <ul>
+        <li>
+          In addition to the search box, the application displays a drop-down menu that allows users to control the order in which the phones are listed.
+        </li>
+      </ul>
+    </p>
+    <h3>Component Template
+    </h3>
+    <p><span><strong>app/phone-list/phone-list.template.html:</strong></span>
+      <pre>
+  <code>
+  <div class="container-fluid">
+  <div class="row">
+    <div class="col-md-2">
+      <!--Sidebar content-->
+
+      <p>
+        Search:
+        <input ng-model="$ctrl.query">
+      </p>
+
+      <p>
+        Sort by:
+        <select ng-model="$ctrl.orderProp">
+          <option value="name">Alphabetical</option>
+          <option value="age">Newest</option>
+        </select>
+      </p>
+
+    </div>
+    <div class="col-md-10">
+      <!--Body content-->
+
+      <ul class="phones">
+        <li ng-repeat="phone in $ctrl.phones | filter:$ctrl.query | orderBy:$ctrl.orderProp">
+          <span>{{phone.name}}</span>
+          <p>{{phone.snippet}}</p>
+        </li>
+      </ul>
+
+    </div>
+  </div>
+</div>
+  </code>
+</pre>
+
+    </p>
+  </section>
+  <section class="main-section" id="Routing_and_Multiple_Views">
+    <header>Routing and Multiple Views</header>
+    <p>
+      In this step, you will learn how to create a layout template and how to build an application that has multiple views by adding routing, using an AngularJS module called ngRoute.
+      <ul>
+        <li>
+          When you now navigate to /index.html, you are redirected to /index.html#!/phones and the phone list appears in the browser.
+        </li>
+        <li>
+          When you click on a phone link, the URL changes to that specific phone and the stub of a phone detail page is displayed.
+        </li>
+      </ul>
+    </p>
+    <p>
+      Application routes in AngularJS are declared via the $routeProvider, which is the provider of the $route service. This service makes it easy to wire together controllers, view templates, and the current URL location in the browser. Using this feature, we can implement deep linking, which lets us utilize the browser's history (back and forward navigation) and bookmarks
+    </p>
+    <p>
+      As you noticed, dependency injection (DI) is at the core of AngularJS, so it's important for you to understand a thing or two about how it works.
+
+      When the application bootstraps, AngularJS creates an injector that will be used to find and inject all of the services that are required by your application. The injector itself doesn't know anything about what the $http or $route services do. In fact, the injector doesn't even know about the existence of these services, unless it is configured with proper module definitions.
+      The injector only carries out the following steps:
+      <ul>
+        <li>Load the module definition(s) that you specify in your application.</li>
+        <li>Register all Providers defined in these module definition(s).</li>
+        <li>Register all Providers defined in these module definition(s).</li>
+      </ul>
+
+    </p>
+  </section>
+  <section class="main-section" id="Event_Handler">
+    <header>Event Handler</header>
+    <p>
+      We bound the ngSrc directive of the large image to the $ctrl.mainImageUrl property.
+
+      We also registered an ngClick handler with thumbnail images. When a user clicks on one of the thumbnail images, the handler will use the $ctrl.setImage() method callback to change the value of the $ctrl.mainImageUrl property to the URL of the clicked thumbnail image.
+    </p>
+    <span><strong>e2e-tests/scenarios.js:</strong></span>
+    <pre>
+    <code>
+    it('should display the first phone image as the main phone image', function() {
+    var mainImage = element(by.css('img.phone'));
+
+    expect(mainImage.getAttribute('src')).toMatch(/img\/phones\/nexus-s.0.jpg/);
+  });
+
+  it('should swap the main image when clicking on a thumbnail image', function() {
+    var mainImage = element(by.css('img.phone'));
+    var thumbnails = element.all(by.css('.phone-thumbs img'));
+
+    thumbnails.get(2).click();
+    expect(mainImage.getAttribute('src')).toMatch(/img\/phones\/nexus-s.2.jpg/);
+
+    thumbnails.get(0).click();
+    expect(mainImage.getAttribute('src')).toMatch(/img\/phones\/nexus-s.0.jpg/);
+  });
+
+});
+    </code>
+    </pre>
+  </section>
+  <section class="main-section" id="REST_and_Custom_Services">
+    <header>REST and Custom Services</header>
+    <p>
+      We define a custom service that represents a RESTful client. Using this client we can make requests for data to the server in an easier way, without having to deal with the lower-level $http API, HTTP methods and URLs.
+    </p>
+    <p>
+      The RESTful functionality is provided by AngularJS in the ngResource module, which is distributed separately from the core AngularJS framework.
+
+      Since we are using npm to install client-side dependencies, this step updates the package.json configuration file to include the new dependency:
+
+    </p>
+  </section>
+  <section class="main-section" id="Conclusion">
+    <header>Conclusion</header>
+    <p>
+      Our application is now complete. Feel free to experiment with the code further, and jump back to previous steps using the git checkout command.
+    </p>
+    All the documents in this page are taken from <a href="https://docs.angularjs.org/tutorial" target="_blank">AngularJS</a>
+  </section>
+
+</main>
+<!-- partial -->
+  <script src='https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js'></script>
+</body>
+</html>
